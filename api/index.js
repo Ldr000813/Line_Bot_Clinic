@@ -2,10 +2,10 @@ require('dotenv').config({ path: '.env.local' });
 const express = require('express');
 const { middleware, messagingApi } = require('@line/bot-sdk');
 
-// 環境変数の読み込み確認
+// 環境変数の読み込み確認 (Vercelで設定されていないとGlobalでクラッシュするためフォールバックを配置)
 const config = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
-  channelSecret: process.env.LINE_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || 'MISSING_ACCESS_TOKEN',
+  channelSecret: process.env.LINE_CHANNEL_SECRET || 'MISSING_SECRET',
 };
 
 // Messaging API クライアントの初期化
