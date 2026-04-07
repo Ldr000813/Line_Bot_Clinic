@@ -33,22 +33,41 @@ module.exports = async (req, res) => {
           return;
         }
 
-        const replyText = "ご連絡ありがとうございます。\n当クリニックが必要と判断した際には対応時間内にスタッフから個別にメッセージをお送りする場合がございます。";
+        const userMessage = event.message.text.trim();
+        let messagesToSend = [];
 
-        const hostUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-          || process.env.VERCEL_URL
-          || "your-ngrok-id.ngrok-free.app";
-        const baseUrl = process.env.BASE_URL || `https://${hostUrl}`;
+        if (userMessage === "新患予約") {
+          // 「新患予約」に対する3通の回答
+          const msg1 = "下記①〜③の手順で操作されない場合、確認後自動キャンセルになります。また初診予約日の二日前にLINEでリマインダを送信しますのでご対応ください。期限までに反応がない場合は自動キャンセルになります。";
+          const msg2 = "①・〈保険証〉や〈資格確認証〉で受診される方はカードを写真に撮り、お送りください。\n　・〈マイナ保険証〉で受診される方はマイナポータルの健康保険証画面にある、資格情報のスクリーンショットをお送りください。1画面に情報が収まらない場合は複数枚のスクリーンショットを撮ってお送りください。\n\n②次に、下記の〈問診票〉フォームに必要事項を入力の上、送信してください。\n\n【問診票フォーム】\nhttps://forms.office.com/r/Vsyy9hpA72\n\n③1，2が完了後、下記〈予約サイト〉のメニュー選択で「新患予約」でご予約ください。\n\n【予約サイト】\nhttps://todoreminder-five.vercel.app/";
+          const msg3 = "⚠️ご注意\n当院での受診意思のある方は、当院LINE公式アカウントをブロックや削除しないでください。\n\n患者さんからのお問い合わせと同様に、当院から患者さんへのご連絡（※）も原則LINEのトークで行っております。\n\n（※）当院からのご連絡は、基本的に次の3種類です。\n・初診予約をされている方への事前リマインド\n・台風など災害でやむを得ず臨時休診とする場合の事前連絡\n・その他、当院が必要と判断した場合のご連絡\n\n当院LINE公式アカウントをブロックや削除されると、当院から患者さんへメッセージが送信できなくなります。\nその場合「当院での受診の意思なし」と判断せざるを得ず、予約自動キャンセル等の処理をさせていただくことになります。\n\n当院での受診意思のある方は、通院中は必ず当院LINE公式アカウントの〈お友だち〉状態を維持してください。\n誤って削除などされた場合は、〈お友だち〉の追加をし直してください。\n\nトーク一覧画面にて、当院LINE公式アカウントがある状態を隠したい場合は「非表示」でご対応ください。";
 
-        const imageUrl = `${baseUrl}/time_table.png`;
-        const previewUrl = `${baseUrl}/time_table.png`;
+          messagesToSend = [
+            { type: 'text', text: msg1 },
+            { type: 'text', text: msg2 },
+            { type: 'text', text: msg3 }
+          ];
+        } else {
+          // それ以外のメッセージに対するデフォルトの回答
+          const replyText = "ご連絡ありがとうございます。\n当クリニックが必要と判断した際には対応時間内にスタッフから個別にメッセージをお送りする場合がございます。";
+
+          const hostUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+            || process.env.VERCEL_URL
+            || "your-ngrok-id.ngrok-free.app";
+          const baseUrl = process.env.BASE_URL || `https://${hostUrl}`;
+
+          const imageUrl = `${baseUrl}/time_table.png`;
+          const previewUrl = `${baseUrl}/time_table.png`;
+
+          messagesToSend = [
+            { type: 'text', text: replyText },
+            { type: 'image', originalContentUrl: imageUrl, previewImageUrl: previewUrl }
+          ];
+        }
 
         await client.replyMessage({
           replyToken: event.replyToken,
-          messages: [
-            { type: 'text', text: replyText },
-            { type: 'image', originalContentUrl: imageUrl, previewImageUrl: previewUrl }
-          ],
+          messages: messagesToSend
         });
       }));
 
