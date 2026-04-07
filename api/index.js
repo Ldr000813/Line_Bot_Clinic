@@ -15,8 +15,8 @@ const client = new messagingApi.MessagingApiClient({
 
 const app = express();
 
-// Webhook エンドポイント
-app.post('/webhook', middleware(config), (req, res) => {
+// Webhook エンドポイント (Vercelのパス書き換えに関わらず全てキャッチする)
+app.post('*', middleware(config), (req, res) => {
   Promise
     .all(req.body.events.map(handleEvent))
     .then((result) => res.json(result))
@@ -24,6 +24,11 @@ app.post('/webhook', middleware(config), (req, res) => {
       console.error(err);
       res.status(500).end();
     });
+});
+
+// ブラウザアクセス時の生存確認用
+app.get('*', (req, res) => {
+  res.send('LINE Bot is running smoothly!');
 });
 
 // イベントごとの処理
