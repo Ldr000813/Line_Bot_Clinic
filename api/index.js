@@ -153,6 +153,15 @@ https://faq.airreserve.net/hc/ja/articles/204379305-%E3%81%8A%E5%AE%A2%E6%A7%98%
           messagesToSend = [
             { type: 'text', text: msg1 }
           ];
+        } else if (userMessage === "ウェブサイト") {
+          const msg1 = `こちらをご覧ください。
+
+【当院ウェブサイト】
+https://kokoroclinic-an4cdluq.manus.space/`;
+
+          messagesToSend = [
+            { type: 'text', text: msg1 }
+          ];
         } else {
           // それ以外のメッセージに対するデフォルトの回答
           const replyText = "ご連絡ありがとうございます。\n当クリニックが必要と判断した際には対応時間内にスタッフから個別にメッセージをお送りする場合がございます。";
