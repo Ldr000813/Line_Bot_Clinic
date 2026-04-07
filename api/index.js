@@ -36,6 +36,15 @@ module.exports = async (req, res) => {
         const userMessage = event.message.text.trim();
         let messagesToSend = [];
 
+        // 全体で共通利用するベースURLと画像URLの定義
+        const hostUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+          || process.env.VERCEL_URL
+          || "your-ngrok-id.ngrok-free.app";
+        const baseUrl = process.env.BASE_URL || `https://${hostUrl}`;
+
+        const imageUrl = `${baseUrl}/time_table.png`;
+        const previewUrl = `${baseUrl}/time_table.png`;
+
         if (userMessage === "新患予約") {
           // 「新患予約」に対する3通の回答
           const msg1 = "下記①〜③の手順で操作されない場合、確認後自動キャンセルになります。また初診予約日の二日前にLINEでリマインダを送信しますのでご対応ください。期限までに反応がない場合は自動キャンセルになります。";
@@ -47,17 +56,17 @@ module.exports = async (req, res) => {
             { type: 'text', text: msg2 },
             { type: 'text', text: msg3 }
           ];
+        } else if (userMessage === "再診予約") {
+          // 「再診予約」に対する2通の回答（テキスト＋画像）
+          const msg1 = "2回目以降の受診の方（なんらかの事情で再診を受診できなかった方を含む）が対象です。\n病状悪化防止のため原則的に毎日お薬を飲んだ計算でお薬が切れる前の日時に予約されることをお勧めします。\n\n下記〈予約サイト〉のメニュー選択で「再診予約」でご予約ください。\n\n【予約サイト】\nhttps://todoreminder-five.vercel.app/\n【重要】「再診予約」以外に入れないでください。\n※予約が無効になります。\n\n空き枠は随時更新されますが、直近では予約が取れないこともありますので、お早めにご予約ください。\n\n予約当日は、受付をする余裕（5分程度）をもってご来院ください。";
+
+          messagesToSend = [
+            { type: 'text', text: msg1 },
+            { type: 'image', originalContentUrl: imageUrl, previewImageUrl: previewUrl }
+          ];
         } else {
           // それ以外のメッセージに対するデフォルトの回答
           const replyText = "ご連絡ありがとうございます。\n当クリニックが必要と判断した際には対応時間内にスタッフから個別にメッセージをお送りする場合がございます。";
-
-          const hostUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-            || process.env.VERCEL_URL
-            || "your-ngrok-id.ngrok-free.app";
-          const baseUrl = process.env.BASE_URL || `https://${hostUrl}`;
-
-          const imageUrl = `${baseUrl}/time_table.png`;
-          const previewUrl = `${baseUrl}/time_table.png`;
 
           messagesToSend = [
             { type: 'text', text: replyText },
